@@ -1,0 +1,14 @@
+Django>=5.0
+djangorestframework
+celery
+redis
+qdrant-client
+psycopg2-binary
+requests
+python-dotenv
+openai
+google-generativeai
+djoser
+djangorestframework-simplejwt
+django-cors-headers
+beautifulsoup4
