@@ -7,6 +7,12 @@ def fetch_url_content(url):
     Returns the extracted text or raises an exception.
     """
     try:
+        # Check for YouTube
+        if "youtube.com" in url or "youtu.be" in url:
+            from services.youtube import YouTubeService
+            yt = YouTubeService()
+            return yt.extract_transcript(url)
+
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         

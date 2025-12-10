@@ -69,7 +69,7 @@ Base URL: `http://localhost:8000/api/v1/`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/v1/ingest/` | Ingest URL and trigger async generation |
+| POST | `/api/v1/ingest/` | Ingest URL (Web/YouTube) and trigger async generation |
 | GET | `/api/v1/decks/` | List all decks |
 | POST | `/api/v1/decks/` | Create a new deck |
 | GET | `/api/v1/cards/` | List cards (filter by `?deck=ID`) |
@@ -81,6 +81,12 @@ Base URL: `http://localhost:8000/api/v1/`
 - Login: `POST /auth/jwt/create/`
 
 ---
+
+## 🧠 AI Capabilities
+
+- **LLM Provider**: Google Gemini (via `gemini-2.0-flash`)
+- **YouTube Ingestion**: Paste any YouTube URL → Get transcript extraction + targeted Flashcards.
+- **Smart Fallback**: Handles missing transcripts gracefully.
 
 ## ✅ Verification
 
@@ -100,7 +106,9 @@ This script creates a user, generating a token, ingests a URL, waits for the Cel
 - Qdrant integration
 - SM-2 Scheduler
 
-### v0.2 - Next Steps
-- [ ] Connect Real LLM (OpenAI/Gemini)
+### v0.2 - Current Phase (AI Sprint)
+- [x] Integrate Gemini 2.0 Flash
+- [x] YouTube Ingestion Pipeline
+- [ ] Vision Pipeline (Images/PDFs)
 - [ ] Next.js Frontend
 - [ ] Deck Versioning (Git-style)
