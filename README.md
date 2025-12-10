@@ -69,7 +69,7 @@ Base URL: `http://localhost:8000/api/v1/`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/v1/ingest/` | Ingest URL (Web/YouTube) and trigger async generation |
+| POST | `/api/v1/ingest/` | Ingest Web/YouTube URL or File (Multipart) |
 | GET | `/api/v1/decks/` | List all decks |
 | POST | `/api/v1/decks/` | Create a new deck |
 | GET | `/api/v1/cards/` | List cards (filter by `?deck=ID`) |
@@ -106,9 +106,26 @@ This script creates a user, generating a token, ingests a URL, waits for the Cel
 - Qdrant integration
 - SM-2 Scheduler
 
-### v0.2 - Current Phase (AI Sprint)
+### v0.2 (AI Sprint) - ✅ Completed
 - [x] Integrate Gemini 2.0 Flash
-- [x] YouTube Ingestion Pipeline
-- [ ] Vision Pipeline (Images/PDFs)
-- [ ] Next.js Frontend
+- [x] YouTube Ingestion Pipeline (Transcript Extraction)
+- [x] Vision Pipeline (Image Uploads + Gemini Vision)
+- [x] PDF/Document Support (Native File API)
+- [x] Generative UI (LLM-generated SVG Diagrams)
+
+### v0.3 (Next Steps)
+- [ ] Next.js Frontend (Modern, Responsive UI)
 - [ ] Deck Versioning (Git-style)
+- [ ] Mobile App (React Native)
+
+## 🛠 Testing
+
+We include a **Postman Collection** (`recallforge.postman_collection.json`) to verify all API endpoints easily.
+
+1. Install [Postman](https://www.postman.com/downloads/).
+2. Import `recallforge.postman_collection.json`.
+3. Run the collection to verify:
+    - User Registration & Login
+    - Deck Creation
+    - Web/YouTube/File Ingestion
+    - Card Review

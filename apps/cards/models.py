@@ -8,6 +8,7 @@ class Card(models.Model):
     source = models.ForeignKey(Source, on_delete=models.SET_NULL, null=True, blank=True, related_name='cards')
     front = models.TextField()
     back = models.TextField()
+    visual_payload = models.TextField(blank=True, null=True, help_text="SVG code or JSON for generative UI")
     vector_id = models.CharField(max_length=255, blank=True, null=True)
     
     # SM-2 Fields

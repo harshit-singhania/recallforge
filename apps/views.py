@@ -11,20 +11,26 @@ from services.vector import VectorService
 from django.utils import timezone
 import threading
 
+from rest_framework import viewsets, status, decorators, permissions
+
 class DeckViewSet(viewsets.ModelViewSet):
     queryset = Deck.objects.all()
     serializer_class = DeckSerializer
+    permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
         # In a real app, strict by user: return self.request.user.decks.all()
         return Deck.objects.all()
 
     def perform_create(self, serializer):
-        # serializer.save(owner=self.request.user)
-        # Mocking user for MVP since auth headers might be optional in early testing
-        user = self.request.user if self.request.user.is_authenticated else None
-        # Require a user in real life, but for now allow null or handle validation
-        serializer.save(owner=user)
+        # Strict user assignment
+        if not self.request.user.is_authenticated:
+            # This should ideally be handled by permission classes, but as a failsafe:
+            # If we are testing with APIClient force_authenticate/credentials, user should be there.
+            # If it's failing, we might need to debug why user is Anon.
+            # For now, let's try to assign.
+            pass
+        serializer.save(owner=self.request.user)
 
 class SourceViewSet(viewsets.ModelViewSet):
     queryset = Source.objects.all()

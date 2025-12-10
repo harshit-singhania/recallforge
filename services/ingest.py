@@ -13,7 +13,10 @@ def fetch_url_content(url):
             yt = YouTubeService()
             return yt.extract_transcript(url)
 
-        response = requests.get(url, timeout=10)
+        headers = {
+            'User-Agent': 'RecallForge/1.0 (Education/Research Bot)'
+        }
+        response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         
         soup = BeautifulSoup(response.content, 'html.parser')

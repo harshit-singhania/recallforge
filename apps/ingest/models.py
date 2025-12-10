@@ -9,8 +9,9 @@ class Source(models.Model):
         COMPLETED = 'COMPLETED', _('Completed')
         FAILED = 'FAILED', _('Failed')
 
-    url = models.URLField()
+    url = models.URLField(max_length=500, blank=True, null=True)
     deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name='sources')
+    file = models.FileField(upload_to='uploads/', blank=True, null=True)
     status = models.CharField(
         max_length=20,
         choices=Status.choices,

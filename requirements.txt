@@ -14,3 +14,4 @@ django-cors-headers
 beautifulsoup4
 yt-dlp
 youtube-transcript-api
+Pillow

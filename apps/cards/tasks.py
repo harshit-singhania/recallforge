@@ -5,25 +5,31 @@ from services.llm import LLMService
 from services.vector import VectorService
 
 @shared_task
-def generate_cards_from_source(source_id):
-    source = Source.objects.get(id=source_id)
-    llm = LLMService()
-    
+def generate_cards_from_source(source_id, is_vision=False):
     try:
-        cards_data = llm.generate_cards(source.extracted_text)
+        source = Source.objects.get(id=source_id)
+        llm = LLMService()
         
-        created_cards_ids = []
+        if is_vision and source.file:
+             # Use absolute path for file upload
+             file_path = source.file.path
+             cards_data = llm.generate_cards_from_file(file_path)
+        else:
+             cards_data = llm.generate_cards(source.extracted_text)
+        
+        created_card_ids = []
         for card_data in cards_data:
             card = Card.objects.create(
                 deck=source.deck,
                 source=source,
                 front=card_data['front'],
-                back=card_data['back']
+                back=card_data['back'],
+                visual_payload=card_data.get('visual_payload')
             )
-            created_cards_ids.append(card.id)
+            created_card_ids.append(card.id)
             
         # Trigger embedding
-        embed_cards.delay(created_cards_ids)
+        embed_cards.delay(created_card_ids)
         
     except Exception as e:
         source.error_log += f"\nGeneration Error: {str(e)}"

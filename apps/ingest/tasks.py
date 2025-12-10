@@ -9,15 +9,28 @@ def process_source_url(source_id):
         source = Source.objects.get(id=source_id)
         source.status = Source.Status.PROCESSING
         source.save()
-        
-        text = fetch_url_content(source.url)
-        source.extracted_text = text
-        source.status = Source.Status.COMPLETED # Partial complete, moving to next step
+        # Determine extraction strategy
+        text_content = ""
+        is_vision = False
+
+        if source.file:
+            # Handle File Source (Images/PDFs)
+            is_vision = True
+            source.extracted_text = "[File Content Processed via Vision API]"
+        elif source.url:
+            # Handle URL Source
+            text = fetch_url_content(source.url)
+            source.extracted_text = text
+            text_content = text
+        else:
+            raise ValueError("Source has no URL and no Image.")
+            
+        source.status = Source.Status.COMPLETED
         source.save()
         
-        # Chain via signature to avoid circular imports if possible, or just import inside
+        # Trigger Card Generation
         from apps.cards.tasks import generate_cards_from_source
-        generate_cards_from_source.delay(source_id)
+        generate_cards_from_source.delay(source.id, is_vision=is_vision)
         
     except Exception as e:
         source = Source.objects.get(id=source_id)
