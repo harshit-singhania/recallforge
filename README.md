@@ -5,72 +5,102 @@ AI-native personal knowledge OS that converts any URL/PDF/image into spaced-repe
 
 ---
 
-## 1. What RecallForge Is
-RecallForge is a system that turns unstructured information (articles, PDFs, screenshots, handwritten notes) into structured learning units: flashcards, concept nodes, and spaced-repetition schedules.  
+## 🚀 Quick Start
 
-It automates the entire process of:
-- Extracting content  
-- Chunking and interpreting it  
-- Generating high-quality cards  
-- Building a knowledge graph  
-- Scheduling reviews using an SRS algorithm  
+### Prerequisites
+- Python 3.10+
+- Docker Desktop or Colima (for Redis, Qdrant, Postgres)
 
-All backed by a clean web UI and version control similar to GitHub.
+### Installation
 
----
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/harshit-singhania/recallforge.git
+   cd recallforge
+   ```
 
-## 2. Why This Matters
-Current tools (Anki, Quizlet, Notion, Roam) solve only pieces of the long-term retention problem.  
-RecallForge targets the **professional learning market** where:
-- Better memory = better performance  
-- Time is scarce  
-- Manual card creation is too slow  
+2. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-AI + vector search + SRS unlock a 10× better workflow.
+3. **Start Infrastructure**
+   We provide a helper script to manage Docker containers (Redis, Qdrant, Postgres) and run migrations.
+   ```bash
+   chmod +x start_infra.sh
+   ./start_infra.sh
+   ```
+   *Commands: `./start_infra.sh [stop|restart|status]`*
 
----
+4. **Run the Backend**
+   Open two terminals:
 
-## 3. Core MVP Features
-- One-tap URL → flashcard deck  
-- LLM-generated cards with difficulty metadata  
-- Deck versioning (commits, diffs, forks)  
-- Qdrant-powered semantic linking between cards  
-- SM-2 based review scheduling  
-- Django REST API + Celery worker pipeline  
-- Basic Next.js UI for studying and editing
+   **Terminal 1 (Django Server):**
+   ```bash
+   python manage.py runserver
+   ```
 
----
-
-## 4. Architecture (MVP)
-- **Backend:** Django + DRF  
-- **Workers:** Celery (ingest + LLM calls + embeddings)  
-- **DB:** Postgres  
-- **Vector DB:** Qdrant  
-- **Cache/Broker:** Redis  
-- **Frontend:** Next.js  
-- **Cloud:** GCP / Cloud Run / Cloud SQL / MemoryStore  
+   **Terminal 2 (Celery Worker):**
+   ```bash
+   celery -A config worker -l info
+   ```
 
 ---
 
-## 5. Roadmap
-### v0.1 (MVP)
-- URL ingest  
-- Auto card generation  
-- Review queue  
-- Basic deck UI  
+## 🏗 Architecture
 
-### v0.2
-- Versioning, diffs, commits  
-- Embedding search  
-- PDF & OCR ingest  
+- **Backend Framework**: Django 5 + Django REST Framework
+- **Asynchronous Tasks**: Celery + Redis
+- **Database**: PostgreSQL
+- **Vector Search**: Qdrant (for semantic similarity)
+- **Authentication**: JWT (Djoser)
 
-### v1.0
-- Teams, collaboration  
-- Knowledge graph visualization  
-- AI tutor mode  
+### Key Services
+- **Ingest**: Fetches content from URLs/PDFs.
+- **LLM Service**: Generates flashcards (currently Mocked, ready for OpenAI/Gemini).
+- **Vector Service**: Embeds cards and indexes them in Qdrant.
+- **Scheduler**: Implements SM-2 Spaced Repetition Algorithm.
 
 ---
 
-## 6. Resume-ready description
-End-to-end LLM-powered knowledge retention system. Designed and implemented ingestion → LLM generation → vector indexing → spaced-repetition scheduling pipeline. Built scalable backend using Django, Celery, Postgres, Qdrant, Redis, and deployed on GCP. Implements Git-style deck versioning, semantic search, and automated learning workflows.
+## 🔌 API Endpoints
 
+Base URL: `http://localhost:8000/api/v1/`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/ingest/` | Ingest URL and trigger async generation |
+| GET | `/api/v1/decks/` | List all decks |
+| POST | `/api/v1/decks/` | Create a new deck |
+| GET | `/api/v1/cards/` | List cards (filter by `?deck=ID`) |
+| GET | `/api/v1/review/next/` | Get next card due for review |
+| POST | `/api/v1/review/{id}/rate/` | Submit review rating (0-5) |
+
+**Authentication**:
+- Register: `POST /auth/users/`
+- Login: `POST /auth/jwt/create/`
+
+---
+
+## ✅ Verification
+
+Run the end-to-end verification script to test the entire pipeline:
+```bash
+python verify_flow.py
+```
+This script creates a user, generating a token, ingests a URL, waits for the Celery worker, and performs a review.
+
+---
+
+## 🗺 Roadmap
+
+### v0.1 (MVP) - ✅ Completed
+- URL ingest & Text Extraction
+- Auto card generation (Mock LLM)
+- Qdrant integration
+- SM-2 Scheduler
+
+### v0.2 - Next Steps
+- [ ] Connect Real LLM (OpenAI/Gemini)
+- [ ] Next.js Frontend
+- [ ] Deck Versioning (Git-style)
