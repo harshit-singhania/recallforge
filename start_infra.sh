@@ -1,51 +1,91 @@
 #!/bin/bash
 set -e
 
-echo "=== RecallForge Infrastructure Startup ==="
+# Colors
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 
-# Function to start a container if not running
-start_container() {
-    NAME=$1
-    IMAGE=$2
-    PORTS=$3 # e.g. "-p 6379:6379"
-    ENV=$4   # e.g. "-e KEY=VAL"
-    VOL=$5   # e.g. "-v vol:/path"
+echo -e "${BLUE}=== RecallForge Infrastructure Manager ===${NC}"
 
-    if [ "$(docker ps -q -f name=$NAME)" ]; then
-        echo "✅ $NAME is already running."
-    else
-        if [ "$(docker ps -aq -f name=$NAME)" ]; then
-            echo "🔄 Starting existing $NAME container..."
-            docker start $NAME
-        else
-            echo "🚀 Creating and starting $NAME..."
-            # We use eval to handle spaces in arguments correctly if needed, 
-            # but for simple cases passing vars directly works with proper quoting interaction.
-            # Simpler approach: construct command string for clarity in echo/debug
-            docker run -d $PORTS $ENV $VOL --name $NAME $IMAGE
-        fi
+check_docker() {
+    if ! docker info > /dev/null 2>&1; then
+        echo -e "${RED}Error: Docker is not running or not accessible.${NC}"
+        echo "Please start Docker Desktop or Colima."
+        exit 1
     fi
 }
 
-# 1. Redis
-start_container "redis" "redis:7-alpine" "-p 6379:6379" "" ""
+start_container() {
+    NAME=$1
+    IMAGE=$2
+    PORTS=$3
+    ENV=$4
+    VOL=$5
 
-# 2. Qdrant
-start_container "qdrant" "qdrant/qdrant:latest" "-p 6333:6333" "" "-v qdrant_data:/qdrant/storage"
+    echo -n "Checking $NAME... "
+    if [ "$(docker ps -q -f name=$NAME)" ]; then
+        echo -e "${GREEN}Running.${NC}"
+    elif [ "$(docker ps -aq -f name=$NAME)" ]; then
+        echo -e "${YELLOW}Stopped. Starting...${NC}"
+        docker start $NAME > /dev/null
+    else
+        echo -e "${BLUE}Creating...${NC}"
+        docker run -d $PORTS $ENV $VOL --name $NAME $IMAGE > /dev/null
+    fi
+}
 
-# 3. Postgres
-# Using port 5433 for host binding as discovered during setup (5432 was busy)
-start_container "db" "postgres:15-alpine" "-p 5433:5432" "-e POSTGRES_DB=recallforge -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres" "-v postgres_data:/var/lib/postgresql/data"
+stop_containers() {
+    echo -e "${YELLOW}Stopping all infrastructure...${NC}"
+    docker stop redis qdrant db 2>/dev/null || true
+    echo -e "${GREEN}Stopped.${NC}"
+}
 
-echo "⏳ Waiting for services to initialize..."
-sleep 5
+run_migrations() {
+    echo -e "${BLUE}Running Django Migrations...${NC}"
+    python manage.py migrate
+}
 
-echo "🛠 Running Django Migrations..."
-python manage.py migrate
+show_status() {
+    echo -e "\n${BLUE}Infrastructure Status:${NC}"
+    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" -f name=redis -f name=qdrant -f name=db
+}
 
-echo "✅ Infrastructure is ready!"
-echo "------------------------------------------------"
-echo "To start the application run:"
-echo "  Terminal 1: python manage.py runserver"
-echo "  Terminal 2: celery -A config worker -l info"
-echo "------------------------------------------------"
+# Main Logic
+check_docker
+
+case "$1" in
+    stop)
+        stop_containers
+        ;;
+    restart)
+        stop_containers
+        $0
+        ;;
+    status)
+        show_status
+        ;;
+    *)
+        # Default: Start
+        start_container "redis" "redis:7-alpine" "-p 6379:6379" "" ""
+        start_container "qdrant" "qdrant/qdrant:latest" "-p 6333:6333" "" "-v qdrant_data:/qdrant/storage"
+        start_container "db" "postgres:15-alpine" "-p 5433:5432" "-e POSTGRES_DB=recallforge -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres" "-v postgres_data:/var/lib/postgresql/data"
+        
+        echo -e "⏳ ${YELLOW}Waiting for services...${NC}"
+        sleep 3
+        
+        run_migrations
+        show_status
+        
+        echo -e "\n${GREEN}✅ Infrastructure is ready!${NC}"
+        echo "------------------------------------------------"
+        echo "Usage: ./start_infra.sh [start|stop|restart|status]"
+        echo "------------------------------------------------"
+        echo "Next Steps:"
+        echo "  Terminal 1: python manage.py runserver"
+        echo "  Terminal 2: celery -A config worker -l info"
+        echo "------------------------------------------------"
+        ;;
+esac
