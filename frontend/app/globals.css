@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+:root {
+  /* Apple-esque Dark Mode System */
+
+  /* Base - Deep OLED Black */
+  --background: #050505;
+  --foreground: #F5F5F7;
+  /* Off-white for readability */
+
+  /* Text Hierarchy */
+  --text-primary: #F5F5F7;
+  --text-secondary: #86868B;
+  /* Apple gray */
+  --text-tertiary: #6E6E73;
+
+  /* Surfaces */
+  --surface-raised: #1C1C1E;
+  /* Modal/Card solid fallback */
+  --surface-glass: rgba(28, 28, 30, 0.6);
+  /* Translucent */
+
+  /* Borders */
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-highlight: rgba(255, 255, 255, 0.2);
+
+  /* Brand - Nebula Link */
+  --accent: #818cf8;
+  /* Indigo 400 - Softer, more readable on dark */
+  --accent-primary: #6366f1;
+  --accent-secondary: #a855f7;
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --accent-glow: rgba(99, 102, 241, 0.25);
+
+  /* Status - Desaturated for elegance */
+  --success: #34d399;
+  /* Emerald 400 */
+  --warning: #fbbf24;
+  /* Amber 400 */
+  --error: #f87171;
+  /* Red 400 */
+
+  /* Radius - Slightly tighter for 'Pro' tool feel */
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-glass: var(--surface-glass);
+
+  --color-border-subtle: var(--border-subtle);
+
+  --color-text-secondary: var(--text-secondary);
+  --color-accent: var(--accent);
+
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.text-gradient {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: var(--surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+}
+
+.glass-card {
+  background: var(--surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  @apply rounded-2xl shadow-sm transition-all duration-300;
+}
+
+.glass-card:hover {
+  border-color: var(--border-highlight);
+  transform: translateY(-1px);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* Glass variables for components */
+:root {
+  --glass-bg: rgba(28, 28, 30, 0.6);
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --text-muted: #48484a;
+}
