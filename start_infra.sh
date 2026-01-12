@@ -18,39 +18,31 @@ check_docker() {
     fi
 }
 
-start_container() {
-    NAME=$1
-    IMAGE=$2
-    PORTS=$3
-    ENV=$4
-    VOL=$5
-
-    echo -n "Checking $NAME... "
-    if [ "$(docker ps -q -f name=$NAME)" ]; then
-        echo -e "${GREEN}Running.${NC}"
-    elif [ "$(docker ps -aq -f name=$NAME)" ]; then
-        echo -e "${YELLOW}Stopped. Starting...${NC}"
-        docker start $NAME > /dev/null
-    else
-        echo -e "${BLUE}Creating...${NC}"
-        docker run -d $PORTS $ENV $VOL --name $NAME $IMAGE > /dev/null
-    fi
+start_containers() {
+    echo -e "${BLUE}Starting infrastructure with Docker Compose...${NC}"
+    docker-compose up -d
 }
 
 stop_containers() {
     echo -e "${YELLOW}Stopping all infrastructure...${NC}"
-    docker stop redis qdrant db 2>/dev/null || true
+    docker-compose down
     echo -e "${GREEN}Stopped.${NC}"
 }
 
 run_migrations() {
     echo -e "${BLUE}Running Django Migrations...${NC}"
-    python manage.py migrate
+    # Check if virtualenv is active or python is available
+    if command -v python >/dev/null 2>&1; then
+        python manage.py migrate
+    else
+        echo -e "${YELLOW}Warning: python command not found. Skipping migrations.${NC}"
+        echo "Please run 'python manage.py migrate' manually inside your virtualenv."
+    fi
 }
 
 show_status() {
     echo -e "\n${BLUE}Infrastructure Status:${NC}"
-    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" -f name=redis -f name=qdrant -f name=db
+    docker-compose ps
 }
 
 # Main Logic
@@ -62,19 +54,19 @@ case "$1" in
         ;;
     restart)
         stop_containers
-        $0
+        sleep 2
+        start_containers
+        show_status
         ;;
     status)
         show_status
         ;;
     *)
         # Default: Start
-        start_container "redis" "redis:7-alpine" "-p 6379:6379" "" ""
-        start_container "qdrant" "qdrant/qdrant:latest" "-p 6333:6333" "" "-v qdrant_data:/qdrant/storage"
-        start_container "db" "postgres:15-alpine" "-p 5433:5432" "-e POSTGRES_DB=recallforge -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres" "-v postgres_data:/var/lib/postgresql/data"
+        start_containers
         
-        echo -e "⏳ ${YELLOW}Waiting for services...${NC}"
-        sleep 3
+        echo -e "⏳ ${YELLOW}Waiting for services to be ready...${NC}"
+        sleep 5
         
         run_migrations
         show_status
@@ -86,6 +78,7 @@ case "$1" in
         echo "Next Steps:"
         echo "  Terminal 1: python manage.py runserver"
         echo "  Terminal 2: celery -A config worker -l info"
+        echo "  Terminal 3: cd frontend && npm run dev"
         echo "------------------------------------------------"
         ;;
 esac

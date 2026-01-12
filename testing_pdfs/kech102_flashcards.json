@@ -1,0 +1,210 @@
+[
+  {
+    "front": "What is the fundamental idea behind Dalton's atomic theory?",
+    "back": "Dalton's atomic theory, proposed in 1808, states that the atom is the ultimate particle of matter. It was able to explain the laws of conservation of mass, constant composition, and multiple proportions.",
+    "hint": "First theory based on scientific basis",
+    "difficulty": "basic",
+    "tags": [
+      "atomic theory",
+      "Dalton"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "What is the significance of the charge to mass ratio (e/m) of an electron, as measured by J.J. Thomson?",
+    "back": "The charge to mass ratio (e/m) is a constant value (1.758820 x 10^11 C kg\u207b\u00b9) that allows for the calculation of the mass of an electron once its charge is known. It also demonstrates electrons are a fundamental constituent of all atoms.",
+    "hint": "Ratio of charge and mass",
+    "difficulty": "intermediate",
+    "tags": [
+      "electron",
+      "charge to mass ratio",
+      "Thomson"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "What did Millikan's oil drop experiment determine?",
+    "back": "Millikan's oil drop experiment (1906-1914) determined the charge of an electron to be -1.6 x 10^-19 C. This value, combined with Thomson's e/m ratio, allowed for the calculation of the electron's mass.",
+    "hint": "Oil and charge",
+    "difficulty": "intermediate",
+    "tags": [
+      "electron",
+      "charge",
+      "Millikan"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "How do the properties of cathode rays (electrons) vary based on the electrode material or gas in the tube?",
+    "back": "The characteristics of cathode rays (electrons) do not depend upon the material of the electrodes or the nature of the gas present in the cathode ray tube. This suggests that electrons are a fundamental constituent of all atoms.",
+    "hint": "Independent properties",
+    "difficulty": "intermediate",
+    "tags": [
+      "cathode rays",
+      "electrons",
+      "properties"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "How did Rutherford's gold foil experiment change the understanding of the atom?",
+    "back": "Rutherford's experiment revealed that most of an atom's mass and positive charge are concentrated in a small, central nucleus. It also showed that most of the atom is empty space, contrary to the plum pudding model.",
+    "hint": "Alpha particles and gold",
+    "difficulty": "intermediate",
+    "tags": [
+      "atomic structure",
+      "Rutherford",
+      "gold foil experiment"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "What are the limitations of Rutherford's model of the atom?",
+    "back": "Rutherford's model fails to explain the stability of the atom (why electrons don't fall into the nucleus) and provides no information about the distribution of electrons around the nucleus or their energies. It also doesn't address the discrete nature of atomic spectra.",
+    "hint": "Instability and distribution",
+    "difficulty": "intermediate",
+    "tags": [
+      "atomic model",
+      "Rutherford",
+      "limitations"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "What is the relationship between frequency, wavelength, and the speed of light for electromagnetic radiation?",
+    "back": "The speed of light (c) is equal to the product of the frequency (\u03bd) and wavelength (\u03bb) of electromagnetic radiation: c = \u03bd\u03bb.  This means frequency and wavelength are inversely proportional.",
+    "hint": "Equation relating speed, frequency, and wavelength",
+    "difficulty": "basic",
+    "tags": [
+      "electromagnetic radiation",
+      "frequency",
+      "wavelength",
+      "speed of light"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "What is the photoelectric effect, and what experimental observations could not be explained by classical physics?",
+    "back": "The photoelectric effect is the emission of electrons from a metal surface when light strikes it.  Classical physics could not explain the instantaneous emission, the existence of a threshold frequency, or the dependence of kinetic energy on frequency rather than intensity.",
+    "hint": "Light and electrons",
+    "difficulty": "intermediate",
+    "tags": [
+      "photoelectric effect",
+      "classical physics",
+      "threshold frequency"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "What is the key idea behind Planck's quantum theory?",
+    "back": "Planck's theory states that energy is emitted or absorbed in discrete packets called quanta. The energy of a quantum is proportional to its frequency, E = h\u03bd, where h is Planck's constant.",
+    "hint": "Energy packets",
+    "difficulty": "basic",
+    "tags": [
+      "quantum theory",
+      "Planck",
+      "energy quantization"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "According to Bohr's model, how does an electron transition between energy levels, and what is the relationship between the energy change and radiation?",
+    "back": "An electron transitions between stationary states by absorbing or emitting energy equal to the energy difference between the states. The frequency of radiation absorbed or emitted is given by Bohr's frequency rule:  \u0394E = h\u03bd.",
+    "hint": "Jumping between levels",
+    "difficulty": "intermediate",
+    "tags": [
+      "Bohr model",
+      "energy levels",
+      "transitions",
+      "frequency rule"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "What is the significance of the negative sign in the electronic energy (E) for the hydrogen atom?",
+    "back": "The negative sign indicates that the energy of the electron in the atom is lower than that of a free electron at rest (infinitely far from the nucleus). As the electron gets closer to the nucleus, E becomes more negative, with the most negative value corresponding to the ground state (n=1).",
+    "hint": "Lower than zero",
+    "difficulty": "intermediate",
+    "tags": [
+      "hydrogen atom",
+      "electronic energy",
+      "Bohr model"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "What is the de Broglie hypothesis, and what does it imply about matter?",
+    "back": "The de Broglie hypothesis proposes that matter, like radiation, exhibits dual behavior, possessing both particle and wave properties. The wavelength (\u03bb) of a particle is inversely proportional to its momentum (p): \u03bb = h/p = h/mv.",
+    "hint": "Waves and particles",
+    "difficulty": "intermediate",
+    "tags": [
+      "de Broglie",
+      "wave-particle duality",
+      "matter"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "State Heisenberg's Uncertainty Principle and its significance.",
+    "back": "Heisenberg's Uncertainty Principle states that it is impossible to simultaneously determine the exact position and exact momentum (or velocity) of an electron. Mathematically, \u0394x * \u0394p \u2265 h/4\u03c0, meaning there is a fundamental limit to the precision with which these properties can be known.",
+    "hint": "Position and momentum",
+    "difficulty": "intermediate",
+    "tags": [
+      "Heisenberg",
+      "uncertainty principle",
+      "position",
+      "momentum"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "What are the four quantum numbers, and what property of an electron does each describe?",
+    "back": "The four quantum numbers are: principal quantum number (n, energy level), azimuthal quantum number (l, orbital shape), magnetic quantum number (m_l, spatial orientation of the orbital), and spin quantum number (m_s, electron spin). Together, they uniquely define the state of an electron in an atom.",
+    "hint": "n, l, ml, s",
+    "difficulty": "basic",
+    "tags": [
+      "quantum numbers",
+      "principal",
+      "azimuthal",
+      "magnetic",
+      "spin"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "What is the aufbau principle, and how does it guide the filling of atomic orbitals?",
+    "back": "The aufbau principle states that electrons first occupy the lowest energy orbitals available in the ground state of an atom. This means orbitals are filled in order of increasing energy, guided by the (n+l) rule.",
+    "hint": "Building up",
+    "difficulty": "intermediate",
+    "tags": [
+      "aufbau principle",
+      "electronic configuration",
+      "orbital filling"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "State Hund's Rule of Maximum Multiplicity.",
+    "back": "Hund's Rule states that pairing of electrons in orbitals belonging to the same subshell (degenerate orbitals) does not take place until each orbital has one electron each (is singly occupied).  All of the singly occupied orbitals will have the same spin.",
+    "hint": "Maximize spin",
+    "difficulty": "intermediate",
+    "tags": [
+      "Hund's rule",
+      "maximum multiplicity",
+      "electronic configuration"
+    ],
+    "visual_payload": null
+  },
+  {
+    "front": "State the Pauli Exclusion Principle.",
+    "back": "The Pauli Exclusion Principle states that no two electrons in an atom can have the same set of four quantum numbers. Only two electrons may exist in the same orbital, and these electrons must have opposite spin.",
+    "hint": "No identical sets",
+    "difficulty": "intermediate",
+    "tags": [
+      "Pauli exclusion principle",
+      "quantum numbers",
+      "electronic configuration"
+    ],
+    "visual_payload": null
+  }
+]

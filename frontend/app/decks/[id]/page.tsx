@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 import Button from '@/components/ui/Button';
 import GlassCard from '@/components/ui/GlassCard';
@@ -17,7 +18,14 @@ import {
     Loader2,
     CheckCircle,
     XCircle,
-    Clock
+    Clock,
+    Upload,
+    ChevronDown,
+    ChevronUp,
+    Lightbulb,
+    Tag,
+    FileText,
+    Youtube
 } from 'lucide-react';
 
 interface Deck {
@@ -30,6 +38,9 @@ interface Card {
     id: number;
     front: string;
     back: string;
+    hint?: string;
+    difficulty?: 'basic' | 'intermediate' | 'advanced';
+    tags?: string[];
     next_review_at?: string;
 }
 
@@ -39,6 +50,12 @@ interface Source {
     status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
     created_at: string;
 }
+
+const DIFFICULTY_STYLES = {
+    basic: { bg: 'bg-green-500/20', text: 'text-green-400', label: 'Basic' },
+    intermediate: { bg: 'bg-yellow-500/20', text: 'text-yellow-400', label: 'Intermediate' },
+    advanced: { bg: 'bg-red-500/20', text: 'text-red-400', label: 'Advanced' },
+};
 
 export default function DeckDetailPage() {
     const params = useParams();
@@ -52,6 +69,8 @@ export default function DeckDetailPage() {
     const [url, setUrl] = useState('');
     const [isIngesting, setIsIngesting] = useState(false);
     const [ingestError, setIngestError] = useState('');
+    const [expandedCard, setExpandedCard] = useState<number | null>(null);
+    const [filterDifficulty, setFilterDifficulty] = useState<string | null>(null);
 
     useEffect(() => {
         async function loadData() {
@@ -85,7 +104,6 @@ export default function DeckDetailPage() {
             });
             setSources(prev => [res.data, ...prev]);
             setUrl('');
-            // Poll for updates
             pollSourceStatus(res.data.id);
         } catch (err: any) {
             console.error(err);
@@ -103,7 +121,6 @@ export default function DeckDetailPage() {
 
                 if (res.data.status === 'COMPLETED' || res.data.status === 'FAILED') {
                     clearInterval(interval);
-                    // Refresh cards if completed
                     if (res.data.status === 'COMPLETED') {
                         const cardsRes = await api.get(`/api/v1/cards/?deck=${deckId}`);
                         setCards(cardsRes.data);
@@ -126,10 +143,35 @@ export default function DeckDetailPage() {
         }
     }
 
+    // Filter cards by difficulty
+    const filteredCards = filterDifficulty
+        ? cards.filter(c => c.difficulty === filterDifficulty)
+        : cards;
+
+    // Count cards by difficulty
+    const difficultyCounts = {
+        basic: cards.filter(c => c.difficulty === 'basic').length,
+        intermediate: cards.filter(c => c.difficulty === 'intermediate').length,
+        advanced: cards.filter(c => c.difficulty === 'advanced').length,
+    };
+
+    // Detect URL type
+    function getUrlIcon(url: string) {
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+            return <Youtube size={14} className="text-red-400" />;
+        }
+        return <LinkIcon size={14} />;
+    }
+
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center text-[var(--text-secondary)]">
-                <Loader2 className="animate-spin mr-2" /> Loading deck...
+            <div className="min-h-screen flex items-center justify-center">
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                >
+                    <Brain size={32} className="text-[var(--accent)]" />
+                </motion.div>
             </div>
         );
     }
@@ -146,9 +188,9 @@ export default function DeckDetailPage() {
     }
 
     return (
-        <div className="p-8 max-w-5xl mx-auto space-y-8">
+        <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-8">
             {/* Header */}
-            <div className="flex items-start justify-between">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                 <div>
                     <Link
                         href="/"
@@ -157,11 +199,11 @@ export default function DeckDetailPage() {
                         <ArrowLeft size={18} /> Back to Decks
                     </Link>
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400">
-                            <Brain size={24} />
+                        <div className="w-14 h-14 rounded-2xl bg-[var(--accent-muted)] flex items-center justify-center">
+                            <Brain size={28} className="text-[var(--accent)]" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold">{deck.name}</h1>
+                            <h1 className="text-2xl lg:text-3xl font-bold text-[var(--text-primary)]">{deck.name}</h1>
                             <p className="text-[var(--text-secondary)]">
                                 {deck.description || 'No description'}
                             </p>
@@ -170,7 +212,7 @@ export default function DeckDetailPage() {
                 </div>
                 <div className="flex gap-3">
                     <Link href={`/review/${deckId}`}>
-                        <Button variant="primary" icon={<Zap />}>
+                        <Button variant="primary" icon={<Zap size={18} />}>
                             Start Review
                         </Button>
                     </Link>
@@ -178,7 +220,7 @@ export default function DeckDetailPage() {
                         variant="ghost"
                         icon={<Trash2 size={18} />}
                         onClick={handleDeleteDeck}
-                        className="text-red-400 hover:bg-red-500/10"
+                        className="text-[var(--error)] hover:bg-[var(--error)]/10"
                     >
                         Delete
                     </Button>
@@ -186,33 +228,40 @@ export default function DeckDetailPage() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4">
-                <GlassCard className="text-center py-6" hoverEffect={false}>
-                    <p className="text-3xl font-bold text-[var(--accent)]">{cards.length}</p>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="p-4 rounded-xl bg-[var(--glass-bg)] border border-[var(--glass-border)]">
+                    <p className="text-2xl font-bold text-[var(--accent)]">{cards.length}</p>
                     <p className="text-sm text-[var(--text-secondary)]">Total Cards</p>
-                </GlassCard>
-                <GlassCard className="text-center py-6" hoverEffect={false}>
-                    <p className="text-3xl font-bold text-green-400">
-                        {cards.filter(c => new Date(c.next_review_at || 0) <= new Date()).length || 0}
+                </div>
+                <div className="p-4 rounded-xl bg-[var(--glass-bg)] border border-[var(--glass-border)]">
+                    <p className="text-2xl font-bold text-[var(--warning)]">
+                        {cards.filter(c => new Date(c.next_review_at || 0) <= new Date()).length}
                     </p>
-                    <p className="text-sm text-[var(--text-secondary)]">Due for Review</p>
-                </GlassCard>
-                <GlassCard className="text-center py-6" hoverEffect={false}>
-                    <p className="text-3xl font-bold text-blue-400">{sources.length}</p>
-                    <p className="text-sm text-[var(--text-secondary)]">Sources</p>
-                </GlassCard>
+                    <p className="text-sm text-[var(--text-secondary)]">Due Today</p>
+                </div>
+                <div className="p-4 rounded-xl bg-[var(--glass-bg)] border border-[var(--glass-border)]">
+                    <p className="text-2xl font-bold text-green-400">{difficultyCounts.basic}</p>
+                    <p className="text-sm text-[var(--text-secondary)]">Basic</p>
+                </div>
+                <div className="p-4 rounded-xl bg-[var(--glass-bg)] border border-[var(--glass-border)]">
+                    <p className="text-2xl font-bold text-yellow-400">{difficultyCounts.intermediate}</p>
+                    <p className="text-sm text-[var(--text-secondary)]">Intermediate</p>
+                </div>
             </div>
 
             {/* Ingest Section */}
             <GlassCard hoverEffect={false}>
-                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <LinkIcon size={20} className="text-[var(--accent)]" />
-                    Add Content from URL
+                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-[var(--text-primary)]">
+                    <Upload size={20} className="text-[var(--accent)]" />
+                    Add Content
                 </h2>
+                <p className="text-sm text-[var(--text-secondary)] mb-4">
+                    Paste a URL (YouTube, articles, documentation) to generate flashcards with AI
+                </p>
                 <form onSubmit={handleIngestUrl} className="flex gap-3">
                     <div className="flex-1">
                         <Input
-                            placeholder="Paste a URL (article, documentation, etc.)"
+                            placeholder="https://youtube.com/watch?v=... or any URL"
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
                             icon={<LinkIcon size={18} />}
@@ -234,64 +283,170 @@ export default function DeckDetailPage() {
                     </Button>
                 </form>
                 {ingestError && (
-                    <p className="text-red-500 text-sm mt-2">{ingestError}</p>
+                    <p className="text-[var(--error)] text-sm mt-2">{ingestError}</p>
                 )}
 
                 {/* Source Status */}
-                {sources.length > 0 && (
-                    <div className="mt-4 space-y-2">
-                        {sources.map(source => (
-                            <div
-                                key={source.id}
-                                className="flex items-center justify-between p-3 bg-white/5 rounded-lg"
-                            >
-                                <span className="text-sm truncate max-w-md">{source.url}</span>
-                                <div className="flex items-center gap-2">
-                                    {source.status === 'PROCESSING' && (
-                                        <span className="flex items-center gap-1 text-yellow-400 text-sm">
-                                            <Clock size={14} className="animate-pulse" /> Processing
-                                        </span>
-                                    )}
-                                    {source.status === 'COMPLETED' && (
-                                        <span className="flex items-center gap-1 text-green-400 text-sm">
-                                            <CheckCircle size={14} /> Completed
-                                        </span>
-                                    )}
-                                    {source.status === 'FAILED' && (
-                                        <span className="flex items-center gap-1 text-red-400 text-sm">
-                                            <XCircle size={14} /> Failed
-                                        </span>
-                                    )}
+                <AnimatePresence>
+                    {sources.length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            className="mt-4 space-y-2"
+                        >
+                            {sources.map(source => (
+                                <div
+                                    key={source.id}
+                                    className="flex items-center justify-between p-3 bg-white/5 rounded-lg"
+                                >
+                                    <div className="flex items-center gap-2 text-sm truncate max-w-md">
+                                        {getUrlIcon(source.url)}
+                                        <span className="truncate">{source.url}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {source.status === 'PROCESSING' && (
+                                            <span className="flex items-center gap-1 text-yellow-400 text-sm">
+                                                <Clock size={14} className="animate-pulse" /> Generating...
+                                            </span>
+                                        )}
+                                        {source.status === 'COMPLETED' && (
+                                            <span className="flex items-center gap-1 text-green-400 text-sm">
+                                                <CheckCircle size={14} /> Done
+                                            </span>
+                                        )}
+                                        {source.status === 'FAILED' && (
+                                            <span className="flex items-center gap-1 text-red-400 text-sm">
+                                                <XCircle size={14} /> Failed
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                            ))}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </GlassCard>
 
             {/* Cards List */}
             <div>
-                <h2 className="text-lg font-semibold mb-4">Cards ({cards.length})</h2>
-                {cards.length === 0 ? (
-                    <GlassCard hoverEffect={false} className="text-center py-12 text-[var(--text-secondary)]">
-                        No cards yet. Add a URL above to generate flashcards with AI!
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+                        Cards ({filteredCards.length})
+                    </h2>
+
+                    {/* Difficulty Filter */}
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setFilterDifficulty(null)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!filterDifficulty
+                                    ? 'bg-[var(--accent)] text-white'
+                                    : 'bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)]'
+                                }`}
+                        >
+                            All
+                        </button>
+                        {(['basic', 'intermediate', 'advanced'] as const).map(d => (
+                            <button
+                                key={d}
+                                onClick={() => setFilterDifficulty(d)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filterDifficulty === d
+                                        ? `${DIFFICULTY_STYLES[d].bg} ${DIFFICULTY_STYLES[d].text}`
+                                        : 'bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)]'
+                                    }`}
+                            >
+                                {DIFFICULTY_STYLES[d].label} ({difficultyCounts[d]})
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {filteredCards.length === 0 ? (
+                    <GlassCard hoverEffect={false} className="text-center py-16">
+                        <div className="w-16 h-16 rounded-full bg-[var(--accent-muted)] flex items-center justify-center mx-auto mb-4">
+                            <FileText size={32} className="text-[var(--accent)]" />
+                        </div>
+                        <p className="text-[var(--text-secondary)]">
+                            {cards.length === 0
+                                ? "No cards yet. Add a URL above to generate flashcards with AI!"
+                                : "No cards match this filter."
+                            }
+                        </p>
                     </GlassCard>
                 ) : (
                     <div className="space-y-3">
-                        {cards.map(card => (
-                            <GlassCard key={card.id} hoverEffect={false} className="p-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <p className="text-xs text-[var(--text-muted)] mb-1">FRONT</p>
-                                        <p className="text-sm">{card.front}</p>
+                        {filteredCards.map((card, index) => {
+                            const isExpanded = expandedCard === card.id;
+                            const diffStyle = card.difficulty ? DIFFICULTY_STYLES[card.difficulty] : null;
+
+                            return (
+                                <motion.div
+                                    key={card.id}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.02 }}
+                                >
+                                    <div
+                                        className="p-4 rounded-xl bg-[var(--glass-bg)] border border-[var(--glass-border)] cursor-pointer hover:border-[var(--glass-border-hover)] transition-colors"
+                                        onClick={() => setExpandedCard(isExpanded ? null : card.id)}
+                                    >
+                                        {/* Card Header */}
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    {/* Difficulty Badge */}
+                                                    {diffStyle && (
+                                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${diffStyle.bg} ${diffStyle.text}`}>
+                                                            {diffStyle.label}
+                                                        </span>
+                                                    )}
+
+                                                    {/* Tags */}
+                                                    {card.tags && card.tags.length > 0 && (
+                                                        <div className="flex items-center gap-1 text-[var(--text-muted)]">
+                                                            <Tag size={12} />
+                                                            <span className="text-xs">{card.tags.slice(0, 2).join(', ')}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <p className="text-sm text-[var(--text-primary)] line-clamp-2">{card.front}</p>
+                                            </div>
+
+                                            <button className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
+                                                {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                            </button>
+                                        </div>
+
+                                        {/* Expanded Content */}
+                                        <AnimatePresence>
+                                            {isExpanded && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    className="overflow-hidden"
+                                                >
+                                                    <div className="pt-4 mt-4 border-t border-[var(--border-subtle)]">
+                                                        <p className="text-xs text-[var(--text-muted)] mb-1 uppercase">Answer</p>
+                                                        <p className="text-sm text-[var(--text-secondary)]">{card.back}</p>
+
+                                                        {card.hint && (
+                                                            <div className="mt-3 p-3 rounded-lg bg-[var(--warning)]/10 border border-[var(--warning)]/20">
+                                                                <div className="flex items-center gap-2 text-[var(--warning)] text-xs mb-1">
+                                                                    <Lightbulb size={14} />
+                                                                    <span className="font-medium">Hint</span>
+                                                                </div>
+                                                                <p className="text-sm text-[var(--text-secondary)]">{card.hint}</p>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
-                                    <div className="border-l border-[var(--border-subtle)] pl-4">
-                                        <p className="text-xs text-[var(--text-muted)] mb-1">BACK</p>
-                                        <p className="text-sm text-[var(--text-secondary)]">{card.back}</p>
-                                    </div>
-                                </div>
-                            </GlassCard>
-                        ))}
+                                </motion.div>
+                            );
+                        })}
                     </div>
                 )}
             </div>

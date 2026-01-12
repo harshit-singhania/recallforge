@@ -6,16 +6,24 @@ from services.vector import VectorService
 
 @shared_task
 def generate_cards_from_source(source_id, is_vision=False):
+    """
+    Generate flashcards from a source using Gemini AI.
+    """
     try:
         source = Source.objects.get(id=source_id)
         llm = LLMService()
         
+        print(f"[AI] Generating cards for source {source_id}, is_vision={is_vision}")
+        
         if is_vision and source.file:
-             # Use absolute path for file upload
-             file_path = source.file.path
-             cards_data = llm.generate_cards_from_file(file_path)
+            # Use vision API for files (images/PDFs)
+            file_path = source.file.path
+            cards_data = llm.generate_cards_from_file(file_path)
         else:
-             cards_data = llm.generate_cards(source.extracted_text)
+            # Use text-based generation
+            cards_data = llm.generate_cards(source.extracted_text)
+        
+        print(f"[AI] Generated {len(cards_data)} cards")
         
         created_card_ids = []
         for card_data in cards_data:
@@ -24,36 +32,60 @@ def generate_cards_from_source(source_id, is_vision=False):
                 source=source,
                 front=card_data['front'],
                 back=card_data['back'],
+                hint=card_data.get('hint'),
+                difficulty=card_data.get('difficulty', 'basic'),
+                tags=card_data.get('tags', []),
                 visual_payload=card_data.get('visual_payload')
             )
             created_card_ids.append(card.id)
             
-        # Trigger embedding
+        # Trigger embedding generation
         embed_cards.delay(created_card_ids)
         
+        print(f"[AI] Created {len(created_card_ids)} cards, embedding triggered")
+        
     except Exception as e:
-        source.error_log += f"\nGeneration Error: {str(e)}"
+        print(f"[AI] Error generating cards: {e}")
+        source.error_log = (source.error_log or "") + f"\nGeneration Error: {str(e)}"
         source.save()
         raise e
 
 @shared_task
 def embed_cards(card_ids):
-    vector_service = VectorService() # This might fail if Qdrant is not up
+    """
+    Generate real embeddings for cards using Gemini and store in Qdrant.
+    """
+    print(f"[Vector] Embedding {len(card_ids)} cards")
     
-    for card_id in card_ids:
-        card = Card.objects.get(id=card_id)
-        # Mock embedding vector for now (extract this to a service later if using OpenAI embeddings)
-        # For now, just random or simple hash to prove pipeline
-        # REALITY: We need an Embedding Provider. I'll mock it here or use a dummy vector.
-        # Qdrant expects strict dimension. In vector.py I set size=384 (common for small models)
-        import random
-        fake_vector = [random.random() for _ in range(384)]
+    try:
+        vector_service = VectorService()
+        llm = LLMService()
         
-        vector_service.upsert_card(
-            card_id=card.id,
-            vector=fake_vector,
-            payload={"front": card.front, "back": card.back, "deck_id": card.deck.id}
-        )
+        for card_id in card_ids:
+            card = Card.objects.get(id=card_id)
+            
+            # Create text for embedding (front + back combined)
+            embed_text = f"{card.front}\n{card.back}"
+            
+            # Get real embedding from Gemini
+            embedding = llm.get_embedding(embed_text)
+            
+            # Store in Qdrant
+            vector_service.upsert_card(
+                card_id=card.id,
+                vector=embedding,
+                payload={
+                    "front": card.front, 
+                    "back": card.back, 
+                    "deck_id": card.deck.id
+                }
+            )
+            
+            card.vector_id = str(card.id)
+            card.save()
+            
+        print(f"[Vector] Successfully embedded {len(card_ids)} cards")
         
-        card.vector_id = str(card.id) 
-        card.save()
+    except Exception as e:
+        print(f"[Vector] Error embedding cards: {e}")
+        raise e

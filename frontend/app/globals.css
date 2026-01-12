@@ -1,106 +1,174 @@
 @import "tailwindcss";
 
+/* ========================================
+   RecallForge Design System
+   A calm, focus-oriented design language
+   ======================================== */
+
+/* Dark Mode (Default) */
 :root {
-  /* Apple-esque Dark Mode System */
-
-  /* Base - Deep OLED Black */
-  --background: #050505;
-  --foreground: #F5F5F7;
-  /* Off-white for readability */
-
-  /* Text Hierarchy */
-  --text-primary: #F5F5F7;
-  --text-secondary: #86868B;
-  /* Apple gray */
-  --text-tertiary: #6E6E73;
-
-  /* Surfaces */
-  --surface-raised: #1C1C1E;
-  /* Modal/Card solid fallback */
-  --surface-glass: rgba(28, 28, 30, 0.6);
-  /* Translucent */
-
+  /* Backgrounds */
+  --background: #0a0f1a;
+  --surface: #141824;
+  --surface-elevated: #1a2030;
+  
+  /* Glass Effects */
+  --glass-bg: rgba(20, 24, 36, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(255, 255, 255, 0.15);
+  
+  /* Text */
+  --text-primary: #e8eaed;
+  --text-secondary: #8b9dc3;
+  --text-muted: #5a6785;
+  
+  /* Accent - Sage Green */
+  --accent: #7cb589;
+  --accent-hover: #8fc49a;
+  --accent-muted: rgba(124, 181, 137, 0.15);
+  
+  /* Status */
+  --success: #7cb589;
+  --warning: #d4a574;
+  --error: #e09891;
+  --info: #7aa2d4;
+  
+  /* Inputs */
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-focus: rgba(124, 181, 137, 0.3);
+  
   /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.1);
-  --border-highlight: rgba(255, 255, 255, 0.2);
-
-  /* Brand - Nebula Link */
-  --accent: #818cf8;
-  /* Indigo 400 - Softer, more readable on dark */
-  --accent-primary: #6366f1;
-  --accent-secondary: #a855f7;
-  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-  --accent-glow: rgba(99, 102, 241, 0.25);
-
-  /* Status - Desaturated for elegance */
-  --success: #34d399;
-  /* Emerald 400 */
-  --warning: #fbbf24;
-  /* Amber 400 */
-  --error: #f87171;
-  /* Red 400 */
-
-  /* Radius - Slightly tighter for 'Pro' tool feel */
-  --radius-lg: 16px;
-  --radius-md: 10px;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.12);
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  
+  /* Radius */
   --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
 }
 
+/* Light Mode */
+[data-theme="light"] {
+  --background: #faf8f5;
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-border-hover: rgba(0, 0, 0, 0.12);
+  
+  --text-primary: #1a1a2e;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  
+  --accent: #5a9e6a;
+  --accent-hover: #4d8a5c;
+  --accent-muted: rgba(90, 158, 106, 0.12);
+  
+  --input-bg: rgba(0, 0, 0, 0.03);
+  --input-border: rgba(0, 0, 0, 0.1);
+  --input-focus: rgba(90, 158, 106, 0.25);
+  
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-default: rgba(0, 0, 0, 0.1);
+  
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Tailwind Theme Integration */
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-
-  --color-surface-raised: var(--surface-raised);
-  --color-surface-glass: var(--surface-glass);
-
-  --color-border-subtle: var(--border-subtle);
-
-  --color-text-secondary: var(--text-secondary);
+  --color-foreground: var(--text-primary);
+  --color-surface: var(--surface);
   --color-accent: var(--accent);
+  --color-border: var(--border-default);
+  
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+}
 
-  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: var(--font-geist-mono);
+/* Base Styles */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
+  color: var(--text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
 }
 
+/* Glass Card */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal);
+}
+
+.glass:hover {
+  border-color: var(--glass-border-hover);
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.glass-card:hover {
+  border-color: var(--glass-border-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Text Utilities */
 .text-gradient {
-  background: var(--accent-gradient);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--info) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Glassmorphism Utilities */
-.glass {
-  background: var(--surface-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-subtle);
+.text-balance {
+  text-wrap: balance;
 }
 
-.glass-card {
-  background: var(--surface-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-subtle);
-  @apply rounded-2xl shadow-sm transition-all duration-300;
+/* Focus Ring */
+.focus-ring {
+  outline: none;
 }
-
-.glass-card:hover {
-  border-color: var(--border-highlight);
-  transform: translateY(-1px);
+.focus-ring:focus-visible {
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--accent);
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -108,18 +176,19 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: var(--border-default);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: var(--text-muted);
 }
+
 /* Animations */
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -127,13 +196,45 @@ body {
   }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out forwards;
+@keyframes fade-in-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-/* Glass variables for components */
-:root {
-  --glass-bg: rgba(28, 28, 30, 0.6);
-  --input-bg: rgba(255, 255, 255, 0.05);
-  --text-muted: #48484a;
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in var(--transition-slow) ease-out forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fade-in-scale var(--transition-slow) ease-out forwards;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* Selection */
+::selection {
+  background: var(--accent-muted);
+  color: var(--text-primary);
+}
+
+/* Placeholder */
+::placeholder {
+  color: var(--text-muted);
 }

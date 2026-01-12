@@ -15,22 +15,42 @@ interface GlassCardProps {
     className?: string;
     onClick?: () => void;
     hoverEffect?: boolean;
+    animate?: boolean;
 }
 
-export default function GlassCard({ children, className, onClick, hoverEffect = true }: GlassCardProps) {
+export default function GlassCard({
+    children,
+    className,
+    onClick,
+    hoverEffect = true,
+    animate = true
+}: GlassCardProps) {
+    const Component = animate ? motion.div : 'div';
+
+    const baseClasses = cn(
+        "bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)] rounded-2xl p-6",
+        "transition-all duration-200",
+        hoverEffect && "cursor-pointer hover:border-[var(--glass-border-hover)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5",
+        className
+    );
+
+    if (animate) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                onClick={onClick}
+                className={baseClasses}
+            >
+                {children}
+            </motion.div>
+        );
+    }
+
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            onClick={onClick}
-            className={cn(
-                "glass rounded-2xl p-6",
-                hoverEffect && "cursor-pointer hover:bg-white/5 active:scale-[0.99] transition-all duration-200",
-                className
-            )}
-        >
+        <div onClick={onClick} className={baseClasses}>
             {children}
-        </motion.div>
+        </div>
     );
 }

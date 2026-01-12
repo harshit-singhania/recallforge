@@ -15,7 +15,7 @@ class VectorService:
         except Exception:
             self.client.create_collection(
                 collection_name=self.collection_name,
-                vectors_config=models.VectorParams(size=384, distance=models.Distance.COSINE),
+                vectors_config=models.VectorParams(size=768, distance=models.Distance.COSINE),
             )
 
     def upsert_card(self, card_id, vector: list, payload: dict):
