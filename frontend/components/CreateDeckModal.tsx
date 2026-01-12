@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { X, Plus } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import api from '@/lib/api';
+import api from '@/utils/axios';
 
 interface CreateDeckModalProps {
     isOpen: boolean;

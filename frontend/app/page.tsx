@@ -3,9 +3,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import api from '@/lib/api';
+import api from '@/utils/axios';
 import Button from "@/components/ui/Button";
 import GlassCard from "@/components/ui/GlassCard";
 import CreateDeckModal from "@/components/CreateDeckModal";
@@ -21,7 +22,11 @@ import {
   Play,
   Clock,
   Target,
-  TrendingUp
+  TrendingUp,
+  Youtube,
+  FileText,
+  Globe,
+  Layers
 } from "lucide-react";
 
 interface Deck {
@@ -68,181 +73,194 @@ export default function Home() {
 
   // Authenticated - Dashboard
   return (
-    <div className="min-h-screen">
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-[var(--accent)]/10 via-transparent to-transparent">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM3Y2I1ODkiIGZpbGwtb3BhY2l0eT0iMC4wNCI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
+    <div className="min-h-screen pb-16">
+      <div className="max-w-5xl mx-auto px-6 py-10 space-y-10">
 
-        <div className="relative px-6 py-12 lg:py-16">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              <div>
-                <motion.h1
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-3xl lg:text-4xl font-bold text-[var(--text-primary)] mb-2"
-                >
-                  Good {getTimeOfDay()}, {user.username} 👋
-                </motion.h1>
-                <p className="text-[var(--text-secondary)] text-lg">
-                  Ready to strengthen your memory?
-                </p>
-              </div>
-
-              <div className="flex gap-3">
-                <Link href="/review">
-                  <Button variant="primary" size="lg" icon={<Play size={18} />}>
-                    Start Studying
-                  </Button>
-                </Link>
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  icon={<Plus size={18} />}
-                  onClick={() => setIsCreateModalOpen(true)}
-                >
-                  New Deck
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-6 py-8 max-w-7xl mx-auto space-y-10">
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <QuickStat
-            icon={<Brain />}
-            value={decks.length}
-            label="Decks"
-            color="accent"
-          />
-          <QuickStat
-            icon={<Target />}
-            value={12}
-            label="Due Today"
-            color="warning"
-            highlight
-          />
-          <QuickStat
-            icon={<TrendingUp />}
-            value="5"
-            label="Day Streak"
-            color="success"
-          />
-          <QuickStat
-            icon={<Clock />}
-            value="23m"
-            label="Study Time"
-            color="info"
-          />
-        </div>
-
-        {/* Due for Review - Prominent CTA */}
-        {decks.length > 0 && (
+        {/* Welcome Section - Clean and simple */}
+        <section>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h1 className="text-2xl lg:text-3xl font-semibold text-[var(--text-primary)] mb-1">
+              Welcome back, {user.username}
+            </h1>
+            <p className="text-[var(--text-muted)]">
+              {getTimeGreeting()}
+            </p>
+          </motion.div>
+        </section>
+
+        {/* Feature Cards - Quizlet-inspired promotional cards */}
+        <section className="space-y-4">
+          {/* Main Feature Card - Study Session */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[var(--accent)] to-[#5a9e6a] p-6 lg:p-8"
           >
-            <div className="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="absolute right-20 bottom-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2" />
+            <Link href="/review">
+              <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--surface)] to-[var(--background)] border border-white/10 p-6 lg:p-8 hover:border-[var(--accent)]/30 transition-all cursor-pointer">
+                <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+                  <div className="flex-1 space-y-4">
+                    <div className="w-12 h-12 rounded-xl bg-[var(--accent)]/15 flex items-center justify-center">
+                      <Zap size={24} className="text-[var(--accent)]" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl lg:text-2xl font-semibold text-[var(--text-primary)] mb-2">
+                        Ready for your daily review?
+                      </h2>
+                      <p className="text-[var(--text-secondary)] max-w-md">
+                        You have cards due for review. A quick session can strengthen your memory significantly.
+                      </p>
+                    </div>
+                    <Button variant="primary" icon={<Play size={16} />}>
+                      Start studying
+                    </Button>
+                  </div>
 
-            <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div>
-                <h2 className="text-xl lg:text-2xl font-bold text-white mb-1">
-                  You have 12 cards due for review
-                </h2>
-                <p className="text-white/80">
-                  Keep your streak going! Reviews take about 5 minutes.
-                </p>
+                  {/* Decorative illustration area */}
+                  <div className="hidden lg:flex items-center justify-center w-48 h-40 rounded-xl bg-gradient-to-br from-[var(--accent)]/10 to-[var(--info)]/10">
+                    <div className="relative">
+                      <div className="w-20 h-20 rounded-2xl bg-[var(--accent)]/20 flex items-center justify-center">
+                        <Brain size={40} className="text-[var(--accent)]" />
+                      </div>
+                      <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[var(--accent)] flex items-center justify-center text-white text-xs font-bold">
+                        12
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <Link href="/review">
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  className="bg-white text-[var(--accent)] hover:bg-white/90 border-0 shadow-lg"
-                  icon={<Zap size={18} />}
-                >
-                  Review Now
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Your Decks */}
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-[var(--text-primary)]">Your Decks</h2>
-            <Link
-              href="/decks"
-              className="flex items-center gap-1 text-sm text-[var(--accent)] hover:underline"
-            >
-              View all <ChevronRight size={16} />
             </Link>
+          </motion.div>
+
+          {/* Secondary Feature Cards Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Create New Deck Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+            >
+              <div
+                onClick={() => setIsCreateModalOpen(true)}
+                className="group relative overflow-hidden rounded-2xl bg-[var(--surface)] border border-white/10 p-6 hover:border-[var(--accent)]/30 transition-all cursor-pointer h-full"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 rounded-xl bg-[var(--accent)]/15 flex items-center justify-center shrink-0">
+                    <Layers size={22} className="text-[var(--accent)]" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-1 group-hover:text-[var(--accent)] transition-colors">
+                      Create a new deck
+                    </h3>
+                    <p className="text-sm text-[var(--text-muted)]">
+                      Start from scratch or import from your content
+                    </p>
+                  </div>
+                  <ChevronRight size={20} className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors" />
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Import Content Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Link href="/decks">
+                <div className="group relative overflow-hidden rounded-2xl bg-[var(--surface)] border border-white/10 p-6 hover:border-[var(--accent)]/30 transition-all cursor-pointer h-full">
+                  <div className="flex items-start gap-4">
+                    <div className="w-11 h-11 rounded-xl bg-[var(--info)]/15 flex items-center justify-center shrink-0">
+                      <Sparkles size={22} className="text-[var(--info)]" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-1 group-hover:text-[var(--accent)] transition-colors">
+                        AI-powered import
+                      </h3>
+                      <p className="text-sm text-[var(--text-muted)]">
+                        Generate flashcards from YouTube, PDFs, or URLs
+                      </p>
+                    </div>
+                    <ChevronRight size={20} className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors" />
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Supported Sources Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+        >
+          <h2 className="text-sm font-medium text-[var(--text-muted)] uppercase tracking-wider mb-4">
+            Import from anywhere
+          </h2>
+          <div className="grid grid-cols-3 gap-3">
+            <SourceChip icon={<Youtube size={18} />} label="YouTube" />
+            <SourceChip icon={<FileText size={18} />} label="PDFs" />
+            <SourceChip icon={<Globe size={18} />} label="Web URLs" />
+          </div>
+        </motion.section>
+
+        {/* Your Decks Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Your Decks</h2>
+            {decks.length > 0 && (
+              <Link
+                href="/decks"
+                className="flex items-center gap-1 text-sm text-[var(--accent)] hover:underline"
+              >
+                View all <ChevronRight size={16} />
+              </Link>
+            )}
           </div>
 
           {decks.length === 0 ? (
             <EmptyState onCreateClick={() => setIsCreateModalOpen(true)} />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {decks.slice(0, 7).map((deck, i) => (
+            <div className="space-y-3">
+              {decks.slice(0, 5).map((deck, i) => (
                 <motion.div
                   key={deck.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.35 + i * 0.05 }}
                 >
-                  <DeckCard deck={deck} />
+                  <DeckRow deck={deck} />
                 </motion.div>
               ))}
-
-              {/* Add New Deck Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35 }}
-                onClick={() => setIsCreateModalOpen(true)}
-                className="group cursor-pointer rounded-2xl border-2 border-dashed border-[var(--border-default)] hover:border-[var(--accent)] bg-[var(--accent-muted)]/30 hover:bg-[var(--accent-muted)] transition-all duration-300 h-52 flex flex-col items-center justify-center"
-              >
-                <div className="w-14 h-14 rounded-2xl bg-[var(--accent-muted)] group-hover:bg-[var(--accent)]/20 flex items-center justify-center mb-3 transition-colors">
-                  <Plus size={28} className="text-[var(--accent)]" />
-                </div>
-                <span className="font-semibold text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
-                  Create New Deck
-                </span>
-              </motion.div>
             </div>
           )}
-        </section>
+        </motion.section>
 
-        {/* Recent Activity */}
-        <section>
-          <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">Recent Activity</h2>
-          <div className="space-y-3">
-            <ActivityItem
-              action="Reviewed 15 cards"
-              deck="Biology 101"
-              time="2 hours ago"
-              icon={<Zap size={16} />}
-            />
-            <ActivityItem
-              action="Created new deck"
-              deck="Machine Learning Fundamentals"
-              time="Yesterday"
-              icon={<Plus size={16} />}
-            />
-            <ActivityItem
-              action="Ingested content from"
-              deck="YouTube: 3Blue1Brown"
-              time="2 days ago"
-              icon={<Sparkles size={16} />}
-            />
+        {/* Quick Stats - Minimal row */}
+        <motion.section
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <h2 className="text-sm font-medium text-[var(--text-muted)] uppercase tracking-wider mb-4">
+            Your progress
+          </h2>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <StatCard value={decks.length} label="Decks" />
+            <StatCard value="12" label="Due today" highlight />
+            <StatCard value="5" label="Day streak" />
+            <StatCard value="2.3h" label="Study time" />
           </div>
-        </section>
+        </motion.section>
+
       </div>
 
       <CreateDeckModal
@@ -252,6 +270,75 @@ export default function Home() {
       />
     </div>
   );
+}
+
+// Helper Components
+
+function SourceChip({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[var(--surface)] border border-white/5 text-[var(--text-secondary)]">
+      <span className="text-[var(--accent)]">{icon}</span>
+      <span className="text-sm font-medium">{label}</span>
+    </div>
+  );
+}
+
+function StatCard({ value, label, highlight }: { value: string | number; label: string; highlight?: boolean }) {
+  return (
+    <div className={`px-4 py-4 rounded-xl border ${highlight ? 'bg-[var(--accent)]/10 border-[var(--accent)]/20' : 'bg-[var(--surface)] border-white/5'}`}>
+      <div className={`text-2xl font-bold mb-1 ${highlight ? 'text-[var(--accent)]' : 'text-[var(--text-primary)]'}`}>
+        {value}
+      </div>
+      <div className="text-sm text-[var(--text-muted)]">{label}</div>
+    </div>
+  );
+}
+
+function DeckRow({ deck }: { deck: Deck }) {
+  return (
+    <Link href={`/decks/${deck.id}`}>
+      <div className="group flex items-center gap-4 p-4 rounded-xl bg-[var(--surface)] border border-white/5 hover:border-[var(--accent)]/30 transition-all">
+        <div className="w-11 h-11 rounded-xl bg-[var(--accent)]/15 flex items-center justify-center shrink-0">
+          <Layers size={20} className="text-[var(--accent)]" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-medium text-[var(--text-primary)] truncate group-hover:text-[var(--accent)] transition-colors">
+            {deck.name}
+          </h3>
+          <p className="text-sm text-[var(--text-muted)] truncate">
+            {deck.card_count || 0} cards
+          </p>
+        </div>
+        <ChevronRight size={18} className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors" />
+      </div>
+    </Link>
+  );
+}
+
+function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
+  return (
+    <div className="text-center py-16 px-6 rounded-2xl border border-dashed border-white/10 bg-[var(--surface)]/50">
+      <div className="w-16 h-16 rounded-2xl bg-[var(--accent)]/15 flex items-center justify-center mx-auto mb-5">
+        <Layers size={32} className="text-[var(--accent)]" />
+      </div>
+      <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
+        No decks yet
+      </h3>
+      <p className="text-[var(--text-muted)] mb-6 max-w-sm mx-auto text-sm">
+        Create your first deck to start learning with AI-powered flashcards
+      </p>
+      <Button variant="primary" icon={<Plus size={16} />} onClick={onCreateClick}>
+        Create your first deck
+      </Button>
+    </div>
+  );
+}
+
+function getTimeGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning. Ready to learn something new?";
+  if (hour < 17) return "Good afternoon. Time for a quick review?";
+  return "Good evening. Let's strengthen your memory.";
 }
 
 // Landing Page for unauthenticated users
@@ -324,164 +411,105 @@ function LandingPage() {
       </section>
 
       {/* Feature Carousel */}
-      <section className="px-6 py-16 lg:py-24">
-        <div className="max-w-6xl mx-auto mb-12 text-center">
-          <h2 className="text-3xl lg:text-5xl font-bold text-[var(--text-primary)] mb-4">
-            Everything you need to master any subject
-          </h2>
-          <p className="text-lg text-[var(--text-secondary)]">
-            Powerful tools designed for serious learners
-          </p>
+      <section className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <FeatureCarousel features={LANDING_FEATURES} />
         </div>
-
-        <FeatureCarousel
-          features={[
-            {
-              id: 'ai-gen',
-              title: 'AI-Powered Cards',
-              description: 'Drop in any content and let AI do the heavy lifting. It extracts key concepts, generates questions, and creates perfectly structured flashcards—so you can focus on learning.',
-              image: '/assets/ai-brain-art.png',
-              color: '#8b5cf6',
-              tags: ['Effortless', 'Instant Generation', 'Smart Context']
-            },
-            {
-              id: 'spaced-rep',
-              title: 'Spaced Repetition',
-              description: 'Our SM-2 algorithm ensures you review material at the perfect moment—right before you are about to forget it. Maximize retention with minimum effort.',
-              image: '/assets/spaced-repetition-art.png',
-              color: '#10b981',
-              tags: ['SM-2 Algorithm', 'Efficiency', 'Long-term Memory']
-            },
-            {
-              id: 'any-source',
-              title: 'Any Source',
-              description: 'Learning happens everywhere. Import content seamlessly from YouTube videos, PDF textbooks, web articles, or your own notes. We unify your knowledge.',
-              image: '/assets/multi-source-art.png',
-              color: '#f97316',
-              tags: ['YouTube', 'PDFs', 'Web', 'Docs']
-            }
-          ]}
-        />
       </section>
 
-      {/* Final CTA */}
-      <section className="px-6 py-20 bg-[var(--surface)]">
-        <div className="max-w-2xl mx-auto text-center">
+      {/* Features Grid */}
+      <section className="py-20 px-6 bg-gradient-to-b from-transparent to-[var(--surface)]/50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold text-[var(--text-primary)] mb-4">
+              Why RecallForge?
+            </h2>
+            <p className="text-[var(--text-secondary)] max-w-xl mx-auto">
+              We combine cutting-edge AI with proven learning science to help you remember more with less effort.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <FeatureCard
+              icon={<Sparkles size={24} />}
+              title="AI-Powered Generation"
+              description="Drop any content and watch as AI creates perfectly-structured flashcards in seconds."
+            />
+            <FeatureCard
+              icon={<Target size={24} />}
+              title="Spaced Repetition"
+              description="Our algorithm shows you cards right before you'd forget them, making review effortless."
+            />
+            <FeatureCard
+              icon={<TrendingUp size={24} />}
+              title="Track Progress"
+              description="See your learning stats and watch your knowledge grow over time."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-6">
+        <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-[var(--text-primary)] mb-4">
-            Your memory, supercharged
+            Ready to supercharge your learning?
           </h2>
-          <p className="text-lg text-[var(--text-secondary)] mb-8">
-            Join learners who remember more with less effort.
+          <p className="text-[var(--text-secondary)] mb-8">
+            Join thousands of learners who are mastering new skills every day.
           </p>
           <Link href="/register">
-            <Button variant="primary" size="lg">
-              Get Started — It's Free
+            <Button variant="primary" size="lg" icon={<ArrowRight size={20} />}>
+              Get Started for Free
             </Button>
           </Link>
         </div>
       </section>
 
-      {/* Footer */}
       <Footer />
     </div>
   );
 }
 
-// Sub-components
-function QuickStat({ icon, value, label, color, highlight }: {
+const LANDING_FEATURES = [
+  {
+    id: 'feature-1',
+    title: 'Turn anything into flashcards',
+    description: 'Paste a YouTube link or upload a PDF. Our AI analyzes the content and generates high-quality flashcards instantly.',
+    image: '/logo.png', // Placeholder
+    color: '#7cb589',
+    tags: ['AI Generation', 'Content Ingestion']
+  },
+  {
+    id: 'feature-2',
+    title: 'Never forget what you learn',
+    description: 'Our spaced repetition algorithm schedules reviews at the perfect time to move knowledge into your long-term memory.',
+    image: '/logo.png', // Placeholder
+    color: '#3b82f6',
+    tags: ['Spaced Repetition', 'Memory Science']
+  },
+  {
+    id: 'feature-3',
+    title: 'Study anywhere, anytime',
+    description: 'Your decks sync across all devices. Start on your laptop and review on your phone during your commute.',
+    image: '/logo.png', // Placeholder
+    color: '#8b5cf6',
+    tags: ['Cross-platform', 'Cloud Sync']
+  }
+];
+
+function FeatureCard({ icon, title, description }: {
   icon: React.ReactNode;
-  value: string | number;
-  label: string;
-  color: string;
-  highlight?: boolean;
-}) {
-  const colorClasses: Record<string, string> = {
-    accent: 'text-[var(--accent)]',
-    warning: 'text-[var(--warning)]',
-    success: 'text-[var(--success)]',
-    info: 'text-[var(--info)]',
-  };
-
-  return (
-    <div className={`p-5 rounded-2xl ${highlight ? 'bg-[var(--accent-muted)] ring-2 ring-[var(--accent)]/30' : 'bg-[var(--glass-bg)] border border-[var(--glass-border)]'}`}>
-      <div className={`${colorClasses[color]} mb-2`}>{icon}</div>
-      <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
-      <p className="text-sm text-[var(--text-secondary)]">{label}</p>
-    </div>
-  );
-}
-
-function DeckCard({ deck }: { deck: Deck }) {
-  return (
-    <Link href={`/decks/${deck.id}`}>
-      <div className="group h-52 p-5 rounded-2xl bg-[var(--glass-bg)] border border-[var(--glass-border)] hover:border-[var(--accent)]/50 hover:shadow-lg transition-all duration-300 flex flex-col justify-between cursor-pointer">
-        <div>
-          <div className="w-12 h-12 rounded-xl bg-[var(--accent-muted)] group-hover:bg-[var(--accent)]/20 flex items-center justify-center mb-3 transition-colors">
-            <Brain size={24} className="text-[var(--accent)]" />
-          </div>
-          <h3 className="font-semibold text-[var(--text-primary)] line-clamp-1 mb-1 group-hover:text-[var(--accent)] transition-colors">
-            {deck.name}
-          </h3>
-          <p className="text-sm text-[var(--text-secondary)] line-clamp-2">
-            {deck.description || "No description"}
-          </p>
-        </div>
-        <div className="flex items-center justify-between pt-3 border-t border-[var(--border-subtle)]">
-          <span className="text-sm text-[var(--text-muted)]">
-            {deck.card_count || 0} cards
-          </span>
-          <span className="text-sm text-[var(--accent)] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-            Open <ChevronRight size={14} />
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
-  return (
-    <div className="text-center py-20 px-6 rounded-2xl border-2 border-dashed border-[var(--border-default)] bg-[var(--accent-muted)]/20">
-      <div className="w-20 h-20 rounded-2xl bg-[var(--accent-muted)] flex items-center justify-center mx-auto mb-6">
-        <Brain size={40} className="text-[var(--accent)]" />
-      </div>
-      <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
-        Create your first deck
-      </h3>
-      <p className="text-[var(--text-secondary)] mb-8 max-w-md mx-auto">
-        Start by creating a deck, then add content from YouTube, PDFs, or any URL to generate flashcards.
-      </p>
-      <Button variant="primary" size="lg" icon={<Plus />} onClick={onCreateClick}>
-        Create Deck
-      </Button>
-    </div>
-  );
-}
-
-function ActivityItem({ action, deck, time, icon }: {
-  action: string;
-  deck: string;
-  time: string;
-  icon: React.ReactNode;
+  title: string;
+  description: string;
 }) {
   return (
-    <div className="flex items-center gap-4 p-4 rounded-xl bg-[var(--glass-bg)] border border-[var(--glass-border)]">
-      <div className="w-10 h-10 rounded-xl bg-[var(--accent-muted)] flex items-center justify-center text-[var(--accent)]">
+    <div className="p-6 rounded-2xl bg-[var(--surface)] border border-white/5">
+      <div className="w-12 h-12 rounded-xl bg-[var(--accent)]/15 flex items-center justify-center text-[var(--accent)] mb-4">
         {icon}
       </div>
-      <div className="flex-1">
-        <p className="text-[var(--text-primary)]">
-          {action} <span className="font-semibold">{deck}</span>
-        </p>
-      </div>
-      <span className="text-sm text-[var(--text-muted)]">{time}</span>
+      <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">{title}</h3>
+      <p className="text-[var(--text-secondary)] text-sm">{description}</p>
     </div>
   );
-}
-
-function getTimeOfDay() {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'morning';
-  if (hour < 17) return 'afternoon';
-  return 'evening';
 }

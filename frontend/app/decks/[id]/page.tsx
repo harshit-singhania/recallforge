@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import api from '@/lib/api';
+import api from '@/utils/axios';
 import Button from '@/components/ui/Button';
 import GlassCard from '@/components/ui/GlassCard';
 import Input from '@/components/ui/Input';
@@ -339,8 +339,8 @@ export default function DeckDetailPage() {
                         <button
                             onClick={() => setFilterDifficulty(null)}
                             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!filterDifficulty
-                                    ? 'bg-[var(--accent)] text-white'
-                                    : 'bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)]'
+                                ? 'bg-[var(--accent)] text-white'
+                                : 'bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)]'
                                 }`}
                         >
                             All
@@ -350,8 +350,8 @@ export default function DeckDetailPage() {
                                 key={d}
                                 onClick={() => setFilterDifficulty(d)}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filterDifficulty === d
-                                        ? `${DIFFICULTY_STYLES[d].bg} ${DIFFICULTY_STYLES[d].text}`
-                                        : 'bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)]'
+                                    ? `${DIFFICULTY_STYLES[d].bg} ${DIFFICULTY_STYLES[d].text}`
+                                    : 'bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)]'
                                     }`}
                             >
                                 {DIFFICULTY_STYLES[d].label} ({difficultyCounts[d]})

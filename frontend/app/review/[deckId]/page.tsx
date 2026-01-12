@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import api from '@/lib/api';
+import api from '@/utils/axios';
 import Button from '@/components/ui/Button';
 import GlassCard from '@/components/ui/GlassCard';
 import {

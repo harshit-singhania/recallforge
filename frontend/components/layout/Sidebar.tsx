@@ -2,6 +2,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
     LayoutGrid,
@@ -9,7 +10,6 @@ import {
     Zap,
     Settings,
     LogOut,
-    Brain,
     User,
     Sun,
     Moon
@@ -40,8 +40,14 @@ export default function Sidebar() {
         >
             {/* Brand */}
             <div className="p-6 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[var(--accent)] flex items-center justify-center shadow-lg">
-                    <Brain className="text-white w-5 h-5" />
+                <div className="relative w-10 h-10">
+                    <Image
+                        src="/logo.png"
+                        alt="RecallForge"
+                        fill
+                        className="object-contain"
+                        priority
+                    />
                 </div>
                 <span className="font-semibold text-lg tracking-tight text-[var(--text-primary)]">RecallForge</span>
             </div>

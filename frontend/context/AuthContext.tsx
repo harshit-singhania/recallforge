@@ -2,12 +2,21 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import Cookies from "js-cookie";
-import api from "@/lib/api";
+import axios from "axios";
+import api from '@/utils/axios';
+
+// Separate axios instance for auth routes (no /api/v1 prefix)
+const authApi = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || 'http://localhost:8000',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
 
 interface AuthContextType {
     user: any;
     login: (username: string, password: string) => Promise<void>;
-    register: (username: string, email: string, password: string) => Promise<void>;
+    register: (username: string, email: string, password: string, dateOfBirth?: string) => Promise<void>;
     logout: () => void;
     isAuthenticated: boolean;
     loading: boolean;
@@ -29,7 +38,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
 
             try {
-                const res = await api.get('/auth/users/me/');
+                const res = await authApi.get('/auth/users/me/', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 setUser(res.data);
             } catch (err: any) {
                 // Only log if it's not a 401 (Unauthorized) which is expected when not logged in
@@ -46,18 +57,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const login = async (username: string, password: string) => {
-        const res = await api.post('/auth/jwt/create/', { username, password });
+        const res = await authApi.post('/auth/jwt/create/', { username, password });
         const { access, refresh } = res.data;
         Cookies.set('accessToken', access);
         Cookies.set('refreshToken', refresh);
 
         // Fetch user details immediately
-        const userRes = await api.get('/auth/users/me/');
+        const userRes = await authApi.get('/auth/users/me/', {
+            headers: { Authorization: `Bearer ${access}` }
+        });
         setUser(userRes.data);
     };
 
-    const register = async (username: string, email: string, password: string) => {
-        await api.post('/auth/users/', { username, email, password });
+    const register = async (username: string, email: string, password: string, dateOfBirth?: string) => {
+        const payload: Record<string, string> = {
+            username,
+            email,
+            password,
+        };
+
+        // Only include date_of_birth if provided
+        if (dateOfBirth) {
+            payload.date_of_birth = dateOfBirth;
+        }
+
+        try {
+            await authApi.post('/auth/users/', payload);
+        } catch (error: any) {
+            console.error('Registration error response:', error.response?.data);
+            throw error;
+        }
         // Auto login
         await login(username, password);
     };

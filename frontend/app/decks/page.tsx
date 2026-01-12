@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import api from '@/lib/api';
+import api from '@/utils/axios';
 import Button from '@/components/ui/Button';
 import GlassCard from '@/components/ui/GlassCard';
 import CreateDeckModal from '@/components/CreateDeckModal';
